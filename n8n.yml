@@ -9,18 +9,20 @@ volumes:
 x-shared: &shared
   restart: always
   environment:
-    - DB_TYPE=postgresdb
-    - DB_POSTGRESDB_HOST=postgres
-    - DB_POSTGRESDB_PORT=5432
-    - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
-    - DB_POSTGRESDB_USER=${POSTGRES_NON_ROOT_USER}
-    - DB_POSTGRESDB_PASSWORD=${POSTGRES_NON_ROOT_PASSWORD}
-    - EXECUTIONS_MODE=queue
-    - QUEUE_BULL_REDIS_HOST=redis
-    - QUEUE_HEALTH_CHECK_ACTIVE=true
-    - N8N_BASIC_AUTH_ACTIVE=true
-    - N8N_BASIC_AUTH_USER
-    - N8N_BASIC_AUTH_PASSWORD
+    DB_TYPE: postgresdb
+    DB_POSTGRESDB_HOST: postgres
+    DB_POSTGRESDB_PORT: 5432
+    DB_POSTGRESDB_DATABASE: ${POSTGRES_DB}
+    DB_POSTGRESDB_USER: ${POSTGRES_NON_ROOT_USER}
+    DB_POSTGRESDB_PASSWORD: ${POSTGRES_NON_ROOT_PASSWORD}
+    GENERIC_TIMEZONE: $$cap_N8N_TIMEZONE
+    TZ: $$cap_N8N_TIMEZONE
+    EXECUTIONS_MODE: queue
+    QUEUE_BULL_REDIS_HOST: redis
+    QUEUE_HEALTH_CHECK_ACTIVE: true
+    N8N_BASIC_AUTH_ACTIVE: true
+    N8N_BASIC_AUTH_USER
+    N8N_BASIC_AUTH_PASSWORD
   links:
     - postgres
     - redis
@@ -37,9 +39,9 @@ services:
     image: postgres:11
     restart: always
     environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
+      - POSTGRES_USER: $$cap_POSTGRES_USER
+      - POSTGRES_PASSWORD: $$cap_POSTGRES_PASSWORD
+      - POSTGRES_DB: $$cap_POSTGRES_DB
       - POSTGRES_NON_ROOT_USER
       - POSTGRES_NON_ROOT_PASSWORD
     volumes:
@@ -79,11 +81,18 @@ services:
 
 caproverOneClickApp:
     variables:
-        - id: '$$cap_myapp_version'
-          label: Awesome App Version
-          defaultValue: '1.2.3'
-          description: Check out their Docker page for the valid tags https://hub.docker.com/r/....../tags
-          validRegex: '/.{1,}/'
+        - id: $$cap_N8N_VERSION
+          label: Application | n8n.io
+          description: Consultez la page Docker pour connaître la dernière version valide. https://hub.docker.com/r/n8nio/n8n/tags
+          defaultValue: '0.198.2'
+          validRegex: /.{1,}/
+        - id: $$cap_N8N_TIMEZONE
+          label: Application | Timezone
+          description: >-
+              Fuseau horaire utilisé par le serveur.
+              Veuillez consulter cette page pour connaître les fuseaux horaires valides: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+          defaultValue: Europe/Paris
+          validRegex: /.{1,}/
     instructions:
         start: |-
             A description that will be displayed to the user when they
